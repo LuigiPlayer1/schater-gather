@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="75eaf1a3-6de3-4f84-bc2c-d4c4ed0859d1" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<email:imap-config name="Email_IMAP" doc:name="Email IMAP" doc:id="5e9a7825-9978-4a28-a0fc-1c2dd41d8b11" >
+		<email:imap-connection user="a89978@ualg.pt" host="smtp.office365.com" port="587" password="!#Y0of">
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:imap-connection>
+	</email:imap-config>
+	<flow name="agregationFlow" doc:id="85c29886-a34b-4a84-b48a-1c06d85e976c" >
+		<http:listener doc:name="Listener" doc:id="9b603b5f-0729-41b3-9dc7-290a46fa6dfa" config-ref="HTTP_Listener_config" path="/agregation"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="cf00e67f-558e-45eb-8f07-8fb58b1b6b3f" >
+			<route >
+				<email:count-messages-imap doc:name="Count messages - IMAP" doc:id="5399f207-f7fa-4cd3-866b-369f60c96a6b" config-ref="Email_IMAP"/>
+			</route>
+			<route >
+				<email:count-messages-imap doc:name="Count messages - IMAP" doc:id="00c2cd40-d843-414f-8f8c-a08635391669" config-ref="Email_IMAP"/>
+			</route>
+			<route >
+				<set-variable value="true" doc:name="Set Variable" doc:id="cc61949c-49fb-4b63-bad5-e75aff80eeb0" variableName="enviado"/>
+			</route>
+			<route >
+				<set-variable value="true" doc:name="Set Variable" doc:id="96edc547-f475-4bed-b45b-492f311a7b36" variableName="recebido"/>
+			</route>
+		</scatter-gather>
+		<file:write doc:name="Write" doc:id="86444b21-7327-4e78-a3a5-375ee1095b4a" path="C:\Users\admin\Desktop\testfolder\New Text Document.txt"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6c346aa2-1d9b-4459-9a48-44f496d3e932" />
+	</flow>
+</mule>
